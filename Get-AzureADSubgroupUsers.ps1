@@ -7,7 +7,7 @@ $group = Get-AzureADGroup -SearchString "GROUPNAME"
 # Create an empty array to store the results
 $results = @()
 
-# Get All Groups in the Group
+# Get all subgroups within the specified group
 $groups = Get-AzureADGroupMember -ObjectId $group.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'Group' }
 
 # Loop through each group
