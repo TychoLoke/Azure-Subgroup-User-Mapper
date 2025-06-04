@@ -8,12 +8,12 @@ $group = Get-AzureADGroup -SearchString "GROUPNAME"
 $results = @()
 
 # Get All Groups in the Group
-$groups = Get-AzureADGroupMember -ObjectId $group.ObjectId | Where-Object { $_.ObjectType -eq 'Group' }
+$groups = Get-AzureADGroupMember -ObjectId $group.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'Group' }
 
 # Loop through each group
 foreach ($g in $groups) {
     # Get all users in the group
-    $users = Get-AzureADGroupMember -ObjectId $g.ObjectId | Where-Object { $_.ObjectType -eq 'User' }
+    $users = Get-AzureADGroupMember -ObjectId $g.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'User' }
     
     # Loop through each user
     foreach ($u in $users) {
