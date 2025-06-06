@@ -1,6 +1,6 @@
 # Azure AD Group and User Export Script
 
-This PowerShell script retrieves a specified group from Azure Active Directory (AD), extracts all subgroups and users within those subgroups, and exports the information to a CSV file.
+This PowerShell script retrieves a specified group from Azure Active Directory (AD) using an exact display name match, extracts all subgroups and users within those subgroups, and exports the information to a CSV file.
 
 ## Requirements
 
@@ -11,12 +11,12 @@ This PowerShell script retrieves a specified group from Azure Active Directory (
 ## How to Use
 
 1. **Connect to Azure AD:** The script first establishes a connection to Azure AD.
-2. **Specify the Group:** Replace `"GROUPNAME"` in the script with the specific group name you want to query.
+2. **Specify the Group:** Replace `"GROUPNAME"` in the script with the exact display name of the group you want to query. The script validates that a single group with that display name exists.
 3. **Run the Script:** Execute the script in a PowerShell environment.
 
 ## What the Script Does
 
-- Retrieves the specified group from Azure AD.
+- Retrieves the specified group from Azure AD using an exact display name filter and stops with an error if no group or multiple groups are found.
 - Initializes an empty array to store the results.
 - Retrieves all subgroups within the specified group, filtering only objects of type 'Group'.
 - Loops through each subgroup and user, creating a custom object that stores the display names of the subgroup and user.

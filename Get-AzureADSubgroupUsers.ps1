@@ -1,17 +1,28 @@
 # Connect to Azure AD
 Connect-AzureAD
 
-# Get the Group Object
-$group = Get-AzureADGroup -SearchString "GROUPNAME"
+# Get the Group Object using exact display name search
+$groups = Get-AzureADGroup -Filter "DisplayName eq 'GROUPNAME'"
+
+if (-not $groups) {
+    Write-Error "No group found with display name 'GROUPNAME'."
+    return
+}
+elseif ($groups.Count -gt 1) {
+    Write-Error "Multiple groups found with display name 'GROUPNAME'. Please specify a unique name."
+    return
+}
+
+$group = $groups[0]
 
 # Create an empty array to store the results
 $results = @()
 
 # Get All Groups in the Group
-$groups = Get-AzureADGroupMember -ObjectId $group.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'Group' }
+$subgroups = Get-AzureADGroupMember -ObjectId $group.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'Group' }
 
-# Loop through each group
-foreach ($g in $groups) {
+# Loop through each subgroup
+foreach ($g in $subgroups) {
     # Get all users in the group
     $users = Get-AzureADGroupMember -ObjectId $g.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'User' }
     
