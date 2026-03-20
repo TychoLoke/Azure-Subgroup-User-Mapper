@@ -7,7 +7,7 @@ param(
     [switch]$ExactMatch
 )
 
-function Initialize-PowerShellAdminHelpers {
+function Initialize-PowerShellAdminHelper {
     $moduleName = "PowerShellAdminHelpers"
 
     if (-not (Get-Module -ListAvailable -Name $moduleName)) {
@@ -19,7 +19,7 @@ function Initialize-PowerShellAdminHelpers {
     Import-Module -Name $moduleName -Force -ErrorAction Stop
 }
 
-Initialize-PowerShellAdminHelpers
+Initialize-PowerShellAdminHelper
 Ensure-OutputDirectory -Path (Split-Path -Path $OutputPath -Parent)
 Ensure-Module -ModuleName "Microsoft.Graph.Groups"
 Ensure-Module -ModuleName "Microsoft.Graph.Users"
@@ -58,7 +58,7 @@ foreach ($g in $childGroups) {
 }
 
 $results | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
-Write-Host "Exported $($results.Count) rows to $OutputPath"
+Write-Output "Exported $($results.Count) rows to $OutputPath"
 
 if (Get-MgContext) {
     Disconnect-MgGraph | Out-Null
