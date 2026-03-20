@@ -1,18 +1,23 @@
 # Azure AD Group and User Export Script
 
-This PowerShell script retrieves a specified group from Azure Active Directory (AD), extracts all subgroups and users within those subgroups, and exports the information to a CSV file.
+This PowerShell script retrieves a specified group from Azure Active Directory (Azure AD), extracts all subgroups and users within those subgroups, and exports the information to a CSV file.
 
 ## Requirements
 
-- Azure AD Module installed in your PowerShell environment.
+- AzureAD module installed in your PowerShell environment.
 - Proper authentication and permissions to read group and user information from Azure AD.
-- Update the output path in the script with the correct file path where you want to save the CSV file.
+- A group name to search for and a writable output path.
 
 ## How to Use
 
 1. **Connect to Azure AD:** The script first establishes a connection to Azure AD.
-2. **Specify the Group:** Replace `"GROUPNAME"` in the script with the specific group name you want to query.
-3. **Run the Script:** Execute the script in a PowerShell environment.
+2. **Specify the Group:** Pass the group name using the `-GroupName` parameter.
+3. **Choose an Output Path:** Optionally override the default CSV path with `-OutputPath`.
+4. **Run the Script:** Execute the script in a PowerShell environment.
+
+```powershell
+.\Get-AzureADSubgroupUsers.ps1 -GroupName "Your Group Name" -OutputPath "C:\Temp\AzureAD-SubgroupUsers.csv"
+```
 
 ## What the Script Does
 
@@ -25,6 +30,11 @@ This PowerShell script retrieves a specified group from Azure Active Directory (
 ## Output
 
 The script creates a CSV file containing two columns: `GroupDisplayName` and `UserDisplayName`. Each row represents a user in a subgroup, displaying the display names of the subgroup and user.
+
+## Notes
+
+- This script currently uses the legacy `AzureAD` module because that is what the implementation was originally built around.
+- If you are standardizing on Microsoft Graph PowerShell, treat this repository as a legacy utility and test it before production use.
 
 ## License
 

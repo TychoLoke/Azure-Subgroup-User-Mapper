@@ -1,31 +1,35 @@
-# Connect to Azure AD
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$GroupName,
+
+    [string]$OutputPath = "C:\Temp\AzureAD-SubgroupUsers.csv"
+)
+
+$outputDirectory = Split-Path -Path $OutputPath -Parent
+if ($outputDirectory -and -not (Test-Path -Path $outputDirectory)) {
+    New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
+}
+
 Connect-AzureAD
 
-# Get the Group Object
-$group = Get-AzureADGroup -SearchString "GROUPNAME"
+$group = Get-AzureADGroup -SearchString $GroupName | Select-Object -First 1
+if (-not $group) {
+    throw "No Azure AD group found for search string '$GroupName'."
+}
 
-# Create an empty array to store the results
 $results = @()
-
-# Get all subgroups within the specified group
 $groups = Get-AzureADGroupMember -ObjectId $group.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'Group' }
 
-# Loop through each group
 foreach ($g in $groups) {
-    # Get all users in the group
     $users = Get-AzureADGroupMember -ObjectId $g.ObjectId -All $true | Where-Object { $_.ObjectType -eq 'User' }
-    
-    # Loop through each user
+
     foreach ($u in $users) {
-        # Create a custom object to store the group and user display names
-        $result = New-Object PSObject
-        $result | Add-Member -MemberType NoteProperty -Name "GroupDisplayName" -Value $g.DisplayName
-        $result | Add-Member -MemberType NoteProperty -Name "UserDisplayName" -Value $u.DisplayName
-        
-        # Add the custom object to the results array
-        $results += $result
+        $results += [PSCustomObject]@{
+            GroupDisplayName = $g.DisplayName
+            UserDisplayName  = $u.DisplayName
+        }
     }
 }
 
-# Export the results to a CSV file
-$results | Export-Csv -Path "C:\path\output\output.csv" -NoTypeInformation
+$results | Export-Csv -Path $OutputPath -NoTypeInformation
+Write-Host "Exported $($results.Count) rows to $OutputPath"
