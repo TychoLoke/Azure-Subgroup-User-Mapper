@@ -7,28 +7,24 @@ param(
     [switch]$ExactMatch
 )
 
-function Ensure-Module {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ModuleName
-    )
+function Initialize-PowerShellAdminHelpers {
+    $moduleName = "PowerShellAdminHelpers"
 
-    if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
-        Install-Module -Name $ModuleName -Scope CurrentUser -Force
+    if (-not (Get-Module -ListAvailable -Name $moduleName)) {
+        $installerPath = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath "Install-PowerShellAdminHelpers.ps1"
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TychoLoke/powershell-admin-helpers/main/Install-PowerShellAdminHelpers.ps1" -OutFile $installerPath
+        & $installerPath
     }
 
-    Import-Module $ModuleName -ErrorAction Stop
+    Import-Module -Name $moduleName -Force -ErrorAction Stop
 }
 
-$outputDirectory = Split-Path -Path $OutputPath -Parent
-if ($outputDirectory -and -not (Test-Path -Path $outputDirectory)) {
-    New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
-}
-
+Initialize-PowerShellAdminHelpers
+Ensure-OutputDirectory -Path (Split-Path -Path $OutputPath -Parent)
 Ensure-Module -ModuleName "Microsoft.Graph.Groups"
 Ensure-Module -ModuleName "Microsoft.Graph.Users"
 
-Connect-MgGraph -Scopes @("Group.Read.All", "User.Read.All") -NoWelcome
+Connect-GraphWithScopes -Scopes @("Group.Read.All", "User.Read.All")
 
 $groups = Get-MgGroup -All -Property "id,displayName"
 $group = if ($ExactMatch) {
@@ -61,6 +57,9 @@ foreach ($g in $childGroups) {
     }
 }
 
-$results | Export-Csv -Path $OutputPath -NoTypeInformation
+$results | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
 Write-Host "Exported $($results.Count) rows to $OutputPath"
-Disconnect-MgGraph | Out-Null
+
+if (Get-MgContext) {
+    Disconnect-MgGraph | Out-Null
+}

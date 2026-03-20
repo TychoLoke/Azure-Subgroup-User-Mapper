@@ -4,9 +4,10 @@ This PowerShell script retrieves a specified group from Microsoft Entra ID, extr
 
 ## Requirements
 
-- `Microsoft.Graph.Groups` and `Microsoft.Graph.Users` modules installed in your PowerShell environment.
+- Permission to install PowerShell modules for the current user.
 - Proper authentication and permissions to read group and user information from Microsoft Entra ID.
 - A group name to search for and a writable output path.
+- Internet access the first time you run the script so it can bootstrap `PowerShellAdminHelpers`.
 
 ## How to Use
 
@@ -14,7 +15,7 @@ This PowerShell script retrieves a specified group from Microsoft Entra ID, extr
 2. **Specify the Group:** Pass the group name using the `-GroupName` parameter.
 3. **Choose an Output Path:** Optionally override the default CSV path with `-OutputPath`.
 4. **Use Exact Matching if Needed:** Add `-ExactMatch` if you want the display name match to be exact.
-5. **Run the Script:** Execute the script in a PowerShell environment.
+5. **Run the Script:** Execute the script in a PowerShell environment. The script will install `PowerShellAdminHelpers` from GitHub if it is missing.
 
 ```powershell
 .\Get-AzureADSubgroupUsers.ps1 -GroupName "Your Group Name" -OutputPath "C:\Temp\AzureAD-SubgroupUsers.csv"
